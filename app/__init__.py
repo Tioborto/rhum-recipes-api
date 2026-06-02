@@ -1,0 +1,3 @@
+"""
+Rhum Recipes API package.
+"""

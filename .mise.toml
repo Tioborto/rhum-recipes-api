@@ -1,0 +1,39 @@
+[tools]
+python = "3.12"
+uv = "latest"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+DATABASE_URL = "sqlite:///./rhum_recipes.db"
+APP_HOST = "0.0.0.0"
+APP_PORT = "8000"
+
+[tasks.install]
+description = "Install Python dependencies via uv"
+run = "uv sync"
+
+[tasks.dev]
+description = "Run the API in development mode with auto-reload (watches file changes)"
+run = "uv run uvicorn app.main:app --host $APP_HOST --port $APP_PORT --reload"
+depends = ["install"]
+
+[tasks.run]
+description = "Run the API in production mode"
+run = "uv run uvicorn app.main:app --host $APP_HOST --port $APP_PORT"
+depends = ["install"]
+
+[tasks.lint]
+description = "Lint and format code with ruff"
+run = [
+  "uv run ruff check app/ --fix",
+  "uv run ruff format app/",
+]
+
+[tasks.test]
+description = "Run tests with pytest"
+run = "uv run pytest tests/ -v"
+depends = ["install"]
+
+[tasks.db-reset]
+description = "Delete the SQLite database (fresh start)"
+run = "rm -f rhum_recipes.db && echo 'Database deleted.'"

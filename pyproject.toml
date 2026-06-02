@@ -1,0 +1,39 @@
+[project]
+name = "rhum-recipes-api"
+version = "0.1.0"
+description = "CRUD API to manage your rhum recipes"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlmodel>=0.0.22",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.5.0",
+    "pytest>=8.0.0",
+    "httpx>=0.27.0",  # for TestClient
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.5.0",
+    "pytest>=8.0.0",
+    "httpx>=0.27.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
