@@ -1,0 +1,75 @@
+erDiagram
+    recipes {
+        int id PK
+        string name
+        string description
+        string ingredients_json
+        int maceration_time_days
+        datetime created_at
+        datetime updated_at
+    }
+
+    global_ingredients {
+        int id PK
+        string name
+        datetime created_at
+        datetime updated_at
+    }
+
+    recipe_ingredients {
+        int recipe_id PK,FK
+        int ingredient_id PK,FK
+        float quantity
+        string unit
+    }
+
+    stock_entries {
+        int id PK
+        string name
+        string origin
+        string state
+        int volume_ml
+        int quantity
+        int vintage
+        date purchase_date
+        date preparation_date
+        string notes
+        int recipe_id FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    bottle_orders {
+        int id PK
+        int quantity
+        float price_per_bottle
+        float total_price
+        string status
+        int client_id FK
+        int stock_entry_id FK
+        date order_date
+        datetime created_at
+        datetime updated_at
+    }
+
+    clients {
+        int id PK
+        string first_name
+        string last_name
+        datetime created_at
+        datetime updated_at
+    }
+
+    users {
+        int id PK
+        string username
+        string theme
+        datetime created_at
+        datetime updated_at
+    }
+
+    recipes ||--o{ recipe_ingredients : "has"
+    global_ingredients ||--o{ recipe_ingredients : "used in"
+    recipes ||--o{ stock_entries : "linked to"
+    clients ||--o{ bottle_orders : "places"
+    stock_entries ||--o{ bottle_orders : "ordered as"
