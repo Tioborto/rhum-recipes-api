@@ -4,10 +4,22 @@ schema: spec-driven
 # This is shown to AI when creating artifacts.
 # Add your tech stack, conventions, style guides, domain knowledge, etc.
 # Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Domain: Rhum arrangé recipes and inventory management
+  Tech stack: FastAPI, Pydantic, SQLite
+  We use conventional commits. This project use OpenSpec for AI spec driven development. 
+  Each feature is documented in the OpenSpec folder and tested with automated tests.
+  Each feature is devided in user stories and epics in the OpenSpec folder. 
+  You can find the epics in the epics folder and the user stories in the user_stories folder.
+  You can find the tests in the tests folder.
+  You can find the models in the models folder.
+  You can find the api in the api folder.
+  You can find the database in the database folder.
+  You can find the schema in the schema folder.
+  You can find the specs in the specs folder.
+  You can find the tasks in the tasks folder.
+  You can find the artifacts in the artifacts folder.
+  You need to create alembic migrations for each feature with upgrade & downgrade functions.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
