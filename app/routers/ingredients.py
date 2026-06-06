@@ -2,6 +2,7 @@
 CRUD router for /ingredients.
 """
 
+from _pytest import compat
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -59,7 +60,8 @@ def list_ingredients(
                     RecipeListItem(
                         id=recipe.id, # type: ignore
                         name=recipe.name,
-                        created_at=recipe.created_at
+                        created_at=recipe.created_at,
+                        maceration_time_days=recipe.maceration_time_days, # type: ignore
                     )
                 )
         

@@ -26,6 +26,11 @@ from sqlmodel import Column, Field, SQLModel, String, Relationship
 # Enums
 # ---------------------------------------------------------------------------
 
+class ThemePreference(StrEnum):
+    light = "light"
+    dark = "dark"
+    system = "system"
+
 
 # ---------------------------------------------------------------------------
 # Ingredient helper (not a DB table — stored as JSON inside the recipe row)
@@ -77,6 +82,8 @@ class Recipe(SQLModel, table=True):
         sa_column=Column("ingredients_json", String, nullable=False, server_default="[]"),
     )
 
+    maceration_time_days: int | None = Field(default=None, description="Recommended maceration time in days")
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -99,12 +106,14 @@ class Recipe(SQLModel, table=True):
 class RecipeCreate(SQLModel):
     name: str = Field(..., max_length=120)
     description: str | None = None
+    maceration_time_days: int | None = None
     ingredients: list[Ingredient] = Field(default_factory=list)
 
 
 class RecipeUpdate(SQLModel):
     name: str | None = Field(default=None, max_length=120)
     description: str | None = None
+    maceration_time_days: int | None = None
     ingredients: list[Ingredient] | None = None
 
 
@@ -112,6 +121,7 @@ class RecipeRead(SQLModel):
     id: int
     name: str
     description: str | None
+    maceration_time_days: int | None
     ingredients: list[Ingredient]
     created_at: datetime
     updated_at: datetime
@@ -130,6 +140,7 @@ class RecipeRead(SQLModel):
             id=recipe.id,  # type: ignore[arg-type]
             name=recipe.name,
             description=recipe.description,
+            maceration_time_days=recipe.maceration_time_days,
             ingredients=ing_list,
             created_at=recipe.created_at,
             updated_at=recipe.updated_at,
@@ -142,6 +153,7 @@ class RecipeListItem(SQLModel):
     id: int
     name: str
     created_at: datetime
+    maceration_time_days: int
 
 
 class GlobalIngredientCreate(SQLModel):
@@ -198,6 +210,7 @@ class StockEntry(SQLModel, table=True):
 
     vintage: int | None = Field(default=None, description="Year of distillation / production")
     purchase_date: date | None = Field(default=None, description="Date purchased / bottled")
+    preparation_date: date | None = Field(default=None, description="Date the preparation started")
 
     notes: str | None = Field(default=None, max_length=2000, description="Tasting notes, provenance, …")
 
@@ -221,6 +234,7 @@ class StockEntryCreate(SQLModel):
     quantity: int = Field(default=1, ge=0)
     vintage: int | None = None
     purchase_date: date | None = None
+    preparation_date: date | None = None
     notes: str | None = Field(default=None, max_length=2000)
     recipe_id: int | None = None
 
@@ -233,6 +247,7 @@ class StockEntryUpdate(SQLModel):
     quantity: int | None = Field(default=None, ge=0)
     vintage: int | None = None
     purchase_date: date | None = None
+    preparation_date: date | None = None
     notes: str | None = Field(default=None, max_length=2000)
     recipe_id: int | None = None
 
@@ -246,6 +261,7 @@ class StockEntryRead(SQLModel):
     quantity: int
     vintage: int | None
     purchase_date: date | None
+    preparation_date: date | None
     notes: str | None
     recipe_id: int | None
     created_at: datetime
@@ -342,3 +358,33 @@ class ClientRead(SQLModel):
 class ClientUpdate(SQLModel):
     first_name: str | None = Field(default=None, max_length=120)
     last_name: str | None = Field(default=None, max_length=120)
+
+# ===========================================================================
+# Users domain (for App owner)
+# ===========================================================================
+
+class User(SQLModel, table=True):
+    __tablename__ = "users"
+
+    id: int | None = Field(default=None, primary_key=True)
+    username: str = Field(default="admin", unique=True, index=True, max_length=120)
+    theme: ThemePreference = Field(default=ThemePreference.system)
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+class UserCreate(SQLModel):
+    username: str = Field(default="admin", max_length=120)
+    theme: ThemePreference = ThemePreference.system
+
+class UserUpdate(SQLModel):
+    theme: ThemePreference | None = None
+
+class UserRead(SQLModel):
+    id: int
+    username: str
+    theme: ThemePreference
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}

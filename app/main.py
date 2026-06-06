@@ -14,6 +14,7 @@ from app.routers.stock import router as stock_router
 from app.routers.orders import router as orders_router
 from app.routers.ingredients import router as ingredients_router
 from app.routers.clients import router as clients_router
+from app.routers.users import router as users_router
 
 # ---------------------------------------------------------------------------
 # Lifespan (replaces deprecated @app.on_event)
@@ -62,6 +63,7 @@ app.include_router(stock_router, prefix="/api/v1")
 app.include_router(orders_router, prefix="/api/v1")
 app.include_router(ingredients_router, prefix="/api/v1")
 app.include_router(clients_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 
 
 # ---------------------------------------------------------------------------

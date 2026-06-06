@@ -62,6 +62,7 @@ def create_recipe(payload: RecipeCreate, session: SessionDep) -> RecipeRead:
     recipe = Recipe(
         name=payload.name,
         description=payload.description,
+        maceration_time_days=payload.maceration_time_days,
     )
     
     session.add(recipe)
@@ -108,6 +109,7 @@ def list_recipes(
             id=r.id,  # type: ignore[arg-type]
             name=r.name,
             created_at=r.created_at,
+            maceration_time_days=r.maceration_time_days,  # type: ignore[arg-type]
         )
         for r in recipes
     ]

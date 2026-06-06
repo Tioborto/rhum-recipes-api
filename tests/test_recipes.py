@@ -50,6 +50,7 @@ def client_fixture(session: Session):
 SAMPLE_RECIPE = {
     "name": "Rhum Vanille Réunion",
     "description": "Macération vanille Bourbon avec rhum agricole blanc.",
+    "maceration_time_days": 90,
     "ingredients": [
         {"name": "Vanille Bourbon", "quantity": 3, "unit": "pods"},
         {"name": "Rhum agricole blanc 50°", "quantity": 70, "unit": "cl"},
@@ -79,6 +80,7 @@ def test_create_recipe(client: TestClient):
     assert r.status_code == 201
     data = r.json()
     assert data["name"] == SAMPLE_RECIPE["name"]
+    assert data["maceration_time_days"] == 90
     assert len(data["ingredients"]) == 3
     assert data["id"] is not None
 
@@ -134,11 +136,12 @@ def test_update_recipe_ingredients(client: TestClient):
     new_ingredients = [{"name": "Citron vert", "quantity": 2, "unit": "pieces"}]
     r = client.patch(
         f"/api/v1/recipes/{created['id']}",
-        json={"ingredients": new_ingredients},
+        json={"ingredients": new_ingredients, "maceration_time_days": 120},
     )
     assert r.status_code == 200
     assert len(r.json()["ingredients"]) == 1
     assert r.json()["ingredients"][0]["name"] == "Citron vert"
+    assert r.json()["maceration_time_days"] == 120
 
 
 def test_update_recipe_not_found(client: TestClient):

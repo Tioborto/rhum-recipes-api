@@ -62,6 +62,7 @@ HOMEMADE_BOTTLE = {
     "origin": "homemade",
     "volume_ml": 500,
     "quantity": 6,
+    "preparation_date": "2024-11-01",
     "notes": "Batch from November 2024.",
 }
 
@@ -92,6 +93,7 @@ def test_create_homemade_stock_entry(client: TestClient):
     assert data["origin"] == "homemade"
     assert data["vintage"] is None
     assert data["purchase_date"] is None
+    assert data["preparation_date"] == "2024-11-01"
 
 
 def test_create_stock_entry_linked_to_recipe(client: TestClient):
@@ -236,10 +238,11 @@ def test_update_stock_entry_notes(client: TestClient):
     created = client.post("/api/v1/stock/", json=COMMERCIAL_BOTTLE).json()
     r = client.patch(
         f"/api/v1/stock/{created['id']}",
-        json={"notes": "Opened first bottle — excellent on the rocks."},
+        json={"notes": "Opened first bottle — excellent on the rocks.", "preparation_date": "2025-01-01"},
     )
     assert r.status_code == 200
     assert "excellent" in r.json()["notes"]
+    assert r.json()["preparation_date"] == "2025-01-01"
 
 
 def test_update_stock_entry_link_recipe(client: TestClient):
