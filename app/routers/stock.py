@@ -5,6 +5,7 @@ A stock entry represents a physical bottle (or set of bottles) on the shelf —
 either a commercial rhum purchase or a homemade batch from a recipe.
 """
 
+from app.models import StockState
 from datetime import UTC, datetime
 from typing import Annotated
 
@@ -69,6 +70,7 @@ def list_stock(
     origin: RhumOrigin | None = Query(default=None),
     recipe_id: int | None = Query(default=None, description="Filter by linked recipe"),
     in_stock_only: bool = Query(default=False, description="Only entries with quantity > 0"),
+    state: StockState | None = Query(default=None, description="Filter by state"),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=50, ge=1, le=200),
 ) -> list[StockEntryRead]:
@@ -79,6 +81,8 @@ def list_stock(
         query = query.where(StockEntry.recipe_id == recipe_id)
     if in_stock_only:
         query = query.where(StockEntry.quantity > 0)
+    if state:
+        query = query.where(StockEntry.state == state)
     query = query.order_by(col(StockEntry.created_at).desc()).offset(offset).limit(limit)
     entries = session.exec(query).all()
     return [StockEntryRead.model_validate(e) for e in entries]
