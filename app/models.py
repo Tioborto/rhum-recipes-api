@@ -32,6 +32,59 @@ class ThemePreference(StrEnum):
     system = "system"
 
 
+class IngredientUnit(StrEnum):
+    # Mass
+    g = "g"
+    kg = "kg"
+    oz = "oz"
+    lb = "lb"
+    # Volume
+    ml = "ml"
+    cl = "cl"
+    dl = "dl"
+    l = "L"
+    fl_oz = "fl oz"
+    tsp = "tsp"
+    tbsp = "tbsp"
+    cup = "cup"
+    # Concentration
+    g_per_l = "g/L"
+    # Count / other
+    piece = "pcs"
+    pinch = "pinch"
+    drop = "drop"
+    leaf = "leaf"
+    stick = "stick"
+    pod = "pod"
+
+
+UNIT_LABELS: dict[IngredientUnit, str] = {
+    IngredientUnit.g: "g — grammes",
+    IngredientUnit.kg: "kg — kilogrammes",
+    IngredientUnit.ml: "ml — millilitres",
+    IngredientUnit.cl: "cl — centilitres",
+    IngredientUnit.l: "L — litres",
+    IngredientUnit.tsp: "tsp — cuillère à café",
+    IngredientUnit.tbsp: "tbsp — cuillère à soupe",
+    IngredientUnit.cup: "cup — tasse",
+    IngredientUnit.g_per_l: "g/L — grammes par litre",
+    IngredientUnit.piece: "pcs — pièces",
+    IngredientUnit.pinch: "pinch — pincée",
+    IngredientUnit.drop: "drop — goutte",
+    IngredientUnit.leaf: "leaf — feuille",
+    IngredientUnit.stick: "stick — bâton",
+    IngredientUnit.pod: "pod — gousse",
+}
+
+
+UNIT_GROUPS: dict[str, list[IngredientUnit]] = {
+    "Masse": [IngredientUnit.g, IngredientUnit.kg],
+    "Volume": [IngredientUnit.ml, IngredientUnit.cl, IngredientUnit.l, IngredientUnit.tsp, IngredientUnit.tbsp, IngredientUnit.cup],
+    "Concentration": [IngredientUnit.g_per_l],
+    "Autre": [IngredientUnit.piece, IngredientUnit.pinch, IngredientUnit.drop, IngredientUnit.leaf, IngredientUnit.stick, IngredientUnit.pod],
+}
+
+
 # ---------------------------------------------------------------------------
 # Ingredient helper (not a DB table — stored as JSON inside the recipe row)
 # ---------------------------------------------------------------------------
@@ -40,7 +93,7 @@ class ThemePreference(StrEnum):
 class Ingredient(SQLModel):
     name: str = Field(..., description="Ingredient name (e.g. vanilla, lime zest)")
     quantity: float = Field(..., gt=0, description="Quantity")
-    unit: str = Field(..., description="Unit (g, ml, cl, pieces, …)")
+    unit: IngredientUnit = Field(..., description="Unit")
 
 
 class GlobalIngredient(SQLModel, table=True):
@@ -58,7 +111,7 @@ class RecipeIngredientLink(SQLModel, table=True):
     recipe_id: int | None = Field(default=None, foreign_key="recipes.id", primary_key=True)
     ingredient_id: int | None = Field(default=None, foreign_key="global_ingredients.id", primary_key=True)
     quantity: float = Field(..., gt=0)
-    unit: str = Field(..., max_length=50)
+    unit: IngredientUnit = Field(..., sa_column=Column(String(20)))
 
     recipe: "Recipe" = Relationship(back_populates="ingredient_links")
     ingredient: "GlobalIngredient" = Relationship()

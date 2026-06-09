@@ -17,6 +17,8 @@ from app.models import (
     RecipeUpdate,
     GlobalIngredient,
     RecipeIngredientLink,
+    IngredientUnit,
+    UNIT_GROUPS,
 )
 
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
@@ -25,8 +27,16 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Units reference endpoint
 # ---------------------------------------------------------------------------
+
+@router.get("/units", summary="List all valid ingredient units grouped by category")
+def get_units() -> dict[str, list[dict[str, str]]]:
+    """Return all valid ingredient units, grouped by category."""
+    return {
+        group: [{"value": u.value, "label": u.value} for u in units]
+        for group, units in UNIT_GROUPS.items()
+    }
 
 
 def _get_or_404(recipe_id: int, session: Session) -> Recipe:
