@@ -1,4 +1,4 @@
-# 🍹 Rhum Recipes API
+  # 🍹 Black Sails API
 
 A CRUD REST API to manage your homemade rhum recipes — ingredients, maceration dates, bottle counts, and production status.
 
@@ -116,7 +116,7 @@ curl -s "http://localhost:8000/api/v1/recipes/?status=in_progress" | jq
 ## Project Structure
 
 ```
-rhum-recipes-api/
+black-sails-api/
 ├── .mise.toml          # Tool versions + task definitions
 ├── pyproject.toml      # uv dependencies + tool config
 ├── app/

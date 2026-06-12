@@ -1,5 +1,5 @@
 """
-Matura API — entry point.
+Black Sails API — entry point.
 """
 
 from contextlib import asynccontextmanager
@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="🍹 Matura API",
+    title="🍹 Black Sails API",
     description=(
         "Manage your homemade rhum recipes and your rhum stock: "
         "ingredients, maceration dates, bottle counts, production status, "
@@ -75,7 +75,7 @@ app.include_router(users_router, prefix="/api/v1")
 def root() -> JSONResponse:
     return JSONResponse(
         {
-            "name": "Matura API",
+            "name": "Black Sails API",
             "version": "0.1.0",
             "docs": "/docs",
             "redoc": "/redoc",

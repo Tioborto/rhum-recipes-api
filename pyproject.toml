@@ -1,5 +1,5 @@
 [project]
-name = "rhum-recipes-api"
+name = "black-sails-api"
 version = "0.1.0"
 description = "CRUD API to manage your rhum recipes"
 requires-python = ">=3.12"
