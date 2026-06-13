@@ -170,6 +170,35 @@ class RecipeUpdate(SQLModel):
     ingredients: list[Ingredient] | None = None
 
 
+def normalize_unit(unit_val: Any) -> IngredientUnit:
+    if not unit_val:
+        return IngredientUnit.piece
+    unit_str = str(unit_val).strip().lower()
+    mapping = {
+        "gousses": IngredientUnit.pod,
+        "gousse": IngredientUnit.pod,
+        "pcs": IngredientUnit.piece,
+        "pieces": IngredientUnit.piece,
+        "pièce": IngredientUnit.piece,
+        "pièces": IngredientUnit.piece,
+        "pincée": IngredientUnit.pinch,
+        "pincées": IngredientUnit.pinch,
+        "goutte": IngredientUnit.drop,
+        "gouttes": IngredientUnit.drop,
+        "feuille": IngredientUnit.leaf,
+        "feuilles": IngredientUnit.leaf,
+        "bâton": IngredientUnit.stick,
+        "bâtons": IngredientUnit.stick,
+        "sachet": IngredientUnit.piece,
+    }
+    if unit_str in mapping:
+        return mapping[unit_str]
+    try:
+        return IngredientUnit(unit_val)
+    except ValueError:
+        return IngredientUnit.piece
+
+
 class RecipeRead(SQLModel):
     id: int
     name: str
@@ -182,12 +211,18 @@ class RecipeRead(SQLModel):
     @classmethod
     def from_orm_recipe(cls, recipe: "Recipe") -> "RecipeRead":
         if recipe.ingredient_links:
-            ing_list = [
-                Ingredient(name=link.ingredient.name, quantity=link.quantity, unit=link.unit)
-                for link in recipe.ingredient_links
-            ]
+            ing_list = []
+            for link in recipe.ingredient_links:
+                safe_unit = normalize_unit(link.unit)
+                ing_list.append(
+                    Ingredient(name=link.ingredient.name, quantity=link.quantity, unit=safe_unit)
+                )
         else:
-            ing_list = [Ingredient(**i) for i in recipe.get_ingredients()]
+            ing_list = []
+            for i in recipe.get_ingredients():
+                i_copy = dict(i)
+                i_copy["unit"] = normalize_unit(i_copy.get("unit"))
+                ing_list.append(Ingredient(**i_copy))
 
         return cls(
             id=recipe.id,  # type: ignore[arg-type]
