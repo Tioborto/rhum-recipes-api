@@ -12,6 +12,7 @@ from sqlmodel import Session, col, select
 
 from app.database import get_session
 from app.models import (
+    BottleOrder,
     Client,
     ClientCreate,
     ClientRead,
@@ -109,5 +110,13 @@ def update_client(
 )
 def delete_client(client_id: int, session: SessionDep) -> None:
     entry = _get_or_404(client_id, session)
+
+    orders = session.exec(select(BottleOrder).where(BottleOrder.client_id == client_id)).all()
+    if orders:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot delete client because it is used in {len(orders)} order(s)."
+        )
+
     session.delete(entry)
     session.commit()
